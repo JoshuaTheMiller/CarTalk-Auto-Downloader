@@ -10,14 +10,17 @@
   "author": "JoshuaTheMiller",
   "license": "MIT",
   "dependencies": {
+    "fs": "0.0.1-security",
     "jquery": "^3.4.1",
-    "puppeteer": "^2.0.0"
+    "puppeteer": "^2.0.0",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "@types/gulp": "^4.0.6",
     "@types/gulp-copy": "0.0.4",
     "@types/node": "^13.1.4",
     "@types/puppeteer": "^2.0.0",
+    "@types/request": "^2.48.4",
     "dotenv": "^8.2.0",
     "gulp": "^4.0.2",
     "gulp-copy": "^4.0.1",
