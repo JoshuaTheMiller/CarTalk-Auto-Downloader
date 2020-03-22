@@ -2,7 +2,7 @@
 
 Follow the steps below if you want to use this
 
-## Perquisites
+## Prerequisites
 
 * Install [node & npm](https://www.npmjs.com/get-npm)
 * Install Typescript (`npm install -g typescript`)
