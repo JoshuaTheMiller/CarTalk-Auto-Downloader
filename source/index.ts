@@ -1,7 +1,6 @@
 import puppeteer from 'puppeteer';
 import fs from 'fs';
 import request from 'request';
-import { URL } from 'url';
 
 const carTalkPage = "https://www.npr.org/podcasts/510208/car-talk";
 
@@ -18,37 +17,53 @@ async function doStuff() {
     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
   });
 
-  while (buttonHandle !== null && isNotHidden) {
+  // while (buttonHandle !== null && isNotHidden) {
 
-    await sleep(500).then(() => {
-      buttonHandle!.click();
-      console.log("Clicked");
-    });
+  //   await sleep(600).then(() => {
+  //     buttonHandle!.click();
+  //     console.log("Clicked");
+  //   });
 
-    buttonHandle = await page.$(".options__load-more");
-    isNotHidden = await page.$eval('.options__load-more', (elem) => {
-      return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
-    });
-  }
+  //   buttonHandle = await page.$(".options__load-more");
+  //   isNotHidden = await page.$eval('.options__load-more', (elem) => {
+  //     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
+  //   });
+  // }
 
   const buttonQuery = ".audio-tool.audio-tool-download > a";
   const buttonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
 
-    // buttonLinks.forEach(link => {
-  //   const notNullLink = link!;
-  //   const fileName = getFileName(notNullLink);
-  //   const folderPath = "E:/CarTalks/";
-  //   console.log(fileName);
-  //   downloadAudioFromLink(notNullLink, fileName, folderPath);
-  // });
+  for(let link of buttonLinks) {
+    const notNullLink = link!;
+    const fileName = getFileName(notNullLink);
+    const folderPath = "E:/CarTalks/";
+    console.log(fileName);  
+
+    //downloadAudioFromLink(notNullLink, fileName, folderPath);
+    await downloadAudioFromLinkAsync(notNullLink, fileName, folderPath);
+  }
 
   console.log(buttonLinks.length);
 }
 
 // Make sure to include trailing slash
-function downloadAudioFromLink(link: string, fileName: string, folderPath: string) {
-  request.get(link)
-    .pipe(fs.createWriteStream(folderPath + fileName));
+async function downloadAudioFromLinkAsync(link: string, fileName: string, folderPath: string) {
+  const filePipe = fs.createWriteStream(folderPath + fileName);
+
+  await new Promise((resolve, reject) => {
+    let stream = request(link)
+      .pipe(filePipe)
+      .on('finish', () => {
+        console.log(`The file is finished downloading.`);
+        resolve();
+      })
+      .on('error', (error) => {
+        reject(error);
+      });
+  })
+  .catch(error => {
+    console.log(`:( error: ${error}`);
+  });
 }
 
 function getFileName(rawLink: string) {
