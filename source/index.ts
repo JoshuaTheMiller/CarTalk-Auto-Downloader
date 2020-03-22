@@ -3,6 +3,8 @@ import fs from 'fs';
 import request from 'request';
 
 const carTalkPage = "https://www.npr.org/podcasts/510208/car-talk";
+// Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
+const magicPageSleepTimer = 700;
 
 async function doStuff() {
   const browser = await puppeteer.launch({ headless: false });
@@ -17,33 +19,41 @@ async function doStuff() {
     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
   });
 
-  // while (buttonHandle !== null && isNotHidden) {
+  while (buttonHandle !== null && isNotHidden) {
 
-  //   await sleep(600).then(() => {
-  //     buttonHandle!.click();
-  //     console.log("Clicked");
-  //   });
+    await sleep(magicPageSleepTimer).then(() => {
+      buttonHandle!.click();
+      console.log("Clicked");
+    });
 
-  //   buttonHandle = await page.$(".options__load-more");
-  //   isNotHidden = await page.$eval('.options__load-more', (elem) => {
-  //     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
-  //   });
-  // }
+    buttonHandle = await page.$(".options__load-more");
+    isNotHidden = await page.$eval('.options__load-more', (elem) => {
+      return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
+    });
+  }
 
   const buttonQuery = ".audio-tool.audio-tool-download > a";
-  const buttonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
+  const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
 
-  for(let link of buttonLinks) {
-    const notNullLink = link!;
-    const fileName = getFileName(notNullLink);
+  if(rawButtonLinks == null) {
+    return;
+  }  
+
+  const buttonLinks = rawButtonLinks.filter(notNullOrUndefined);
+
+  for(let link of buttonLinks) {    
+    const fileName = getFileName(link);
     const folderPath = "E:/CarTalks/";
     console.log(fileName);  
-
-    //downloadAudioFromLink(notNullLink, fileName, folderPath);
-    await downloadAudioFromLinkAsync(notNullLink, fileName, folderPath);
+    
+    await downloadAudioFromLinkAsync(link, fileName, folderPath);
   }
 
   console.log(buttonLinks.length);
+}
+
+function notNullOrUndefined<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined;
 }
 
 // Make sure to include trailing slash
@@ -69,8 +79,8 @@ async function downloadAudioFromLinkAsync(link: string, fileName: string, folder
 function getFileName(rawLink: string) {
   const indexOfMp3 = rawLink.indexOf(".mp3");
   const partialSubstring = rawLink.substring(0, indexOfMp3);
-  const lastIndexofSlash = partialSubstring.lastIndexOf("/");
-  const fileName = partialSubstring.substring(lastIndexofSlash + 1) + ".mp3";
+  const lastIndexOfSlash = partialSubstring.lastIndexOf("/");
+  const fileName = partialSubstring.substring(lastIndexOfSlash + 1) + ".mp3";
   return fileName;
 }
 
