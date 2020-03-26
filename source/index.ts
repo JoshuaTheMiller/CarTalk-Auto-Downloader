@@ -1,3 +1,8 @@
+#!/usr/bin/env node
+
+import chalk from 'chalk';
+import figlet from 'figlet';
+import program from 'commander'
 import puppeteer from 'puppeteer';
 import fs from 'fs';
 import request from 'request';
@@ -6,8 +11,8 @@ const carTalkPage = "https://www.npr.org/podcasts/510208/car-talk";
 // Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
 const magicPageSleepTimer = 700;
 
-async function doStuff() {
-  const browser = await puppeteer.launch({ headless: false });
+async function doStuff(parameters: {showBrowser:boolean}) {
+  const browser = await puppeteer.launch({ headless: !parameters.showBrowser });
   const page = await browser.newPage();
   await page.goto(carTalkPage, { waitUntil: 'networkidle2' });
 
@@ -88,4 +93,24 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-doStuff();
+console.log(
+  chalk.blueBright(
+    figlet.textSync('Car Talk Episode Scraper', { horizontalLayout: 'full' })
+  )
+);
+
+program  
+  .version('0.0.1')
+  .description('Download publicly available Car Talk episodes via a CLI!')
+  .option('--show-browser', 'Displays the web browser instance as the scraper is running', false)
+  .parse(process.argv);    
+
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}
+
+if(program.showBrowser) {
+  console.log("Browser")
+}
+
+doStuff(program.showBrowser);
