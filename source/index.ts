@@ -99,7 +99,8 @@ console.log(
   )
 );
 
-program  
+program
+  .name("cartalk-scraper")
   .version('0.0.1')
   .description('Download publicly available Car Talk episodes via a CLI!')
   .option('--show-browser', 'Displays the web browser instance as the scraper is running.', false)
