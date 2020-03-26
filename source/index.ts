@@ -102,15 +102,14 @@ console.log(
 program  
   .version('0.0.1')
   .description('Download publicly available Car Talk episodes via a CLI!')
-  .option('--show-browser', 'Displays the web browser instance as the scraper is running', false)
+  .option('--show-browser', 'Displays the web browser instance as the scraper is running.', false)
+  .option('--force-run-all', 'Compiles the list of Car Talk episodes, and downloads them.', false)
   .parse(process.argv);    
 
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
 
-if(program.showBrowser) {
-  console.log("Browser")
+if(program.runAll) {
+  doStuff(program.showBrowser);
 }
-
-doStuff(program.showBrowser);
