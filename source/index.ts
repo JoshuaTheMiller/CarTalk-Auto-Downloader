@@ -11,7 +11,7 @@ const carTalkPage = "https://www.npr.org/podcasts/510208/car-talk";
 // Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
 const magicPageSleepTimer = 700;
 
-async function doStuff(parameters: {showBrowser:boolean}) {
+async function doStuff(parameters: { showBrowser: boolean, outputFolder: string }) {
   const browser = await puppeteer.launch({ headless: !parameters.showBrowser });
   const page = await browser.newPage();
   await page.goto(carTalkPage, { waitUntil: 'networkidle2' });
@@ -40,17 +40,18 @@ async function doStuff(parameters: {showBrowser:boolean}) {
   const buttonQuery = ".audio-tool.audio-tool-download > a";
   const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
 
-  if(rawButtonLinks == null) {
+  if (rawButtonLinks == null) {
     return;
-  }  
+  }
 
   const buttonLinks = rawButtonLinks.filter(notNullOrUndefined);
 
-  for(let link of buttonLinks) {    
+  for (let link of buttonLinks) {
     const fileName = getFileName(link);
-    const folderPath = "E:/CarTalks/";
-    console.log(fileName);  
-    
+    const folderPath = parameters.outputFolder;
+
+    console.log(fileName);
+
     await downloadAudioFromLinkAsync(link, fileName, folderPath);
   }
 
@@ -76,9 +77,9 @@ async function downloadAudioFromLinkAsync(link: string, fileName: string, folder
         reject(error);
       });
   })
-  .catch(error => {
-    console.log(`:( error: ${error}`);
-  });
+    .catch(error => {
+      console.log(`:( error: ${error}`);
+    });
 }
 
 function getFileName(rawLink: string) {
@@ -99,18 +100,34 @@ console.log(
   )
 );
 
+function getAppDataPath() {
+  return process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+}
+
+const defaultPath = getAppDataPath() + "\\cartalk-scraper"
+
 program
   .name("cartalk-scraper")
   .version('0.0.1')
   .description('Download publicly available Car Talk episodes via a CLI!')
   .option('--show-browser', 'Displays the web browser instance as the scraper is running.', false)
   .option('--force-run-all', 'Compiles the list of Car Talk episodes, and downloads them.', false)
-  .parse(process.argv);    
+  .option('-f, --output-folder <path>', 'Compiles the list of Car Talk episodes, and downloads them.', defaultPath)
+  .option('-d, --dry-run', 'Eventually, this will scrape the Car Talk website and display what the output may represent. Will not download.', false)
+  .parse(process.argv);
 
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
 
-if(program.runAll) {
-  doStuff(program.showBrowser);
+const outFolder = program.outputFolder;
+
+if(program.dryRun) {
+  console.log(`Output Folder: '${outFolder}'`)
+}
+else if (program.runAll) {
+  doStuff({
+    outputFolder: outFolder,
+    showBrowser: program.showBrowser
+  });
 }

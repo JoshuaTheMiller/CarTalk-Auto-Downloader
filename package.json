@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node ./out/index.js"    
+    "start": "tsc && node ./out/index.js"
   },
   "bin": {
     "cartalk-scarper": "./out/index.js"
