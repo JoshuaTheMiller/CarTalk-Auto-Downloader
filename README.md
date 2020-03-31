@@ -4,6 +4,8 @@ As with any tool that helps automate tasks you would have done anyways, please u
 
 ## Why did I make this?
 
+![A random sunrise picture from Feb 2011](./docs/assets/SomeSunriseFrom2011.jpg)
+
 Long story short, a friend of mine asked me if it was possible to do something like this. I remembered listening to Car Talk years ago (back when there was more time for adventures), and the nostalgia immediately drew me in. 
 
 (...while it is true that I would have done this regardless of podcast, I'm always open to a good excuse for a new project that I might be able to finish 😀)
