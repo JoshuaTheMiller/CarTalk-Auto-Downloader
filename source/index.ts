@@ -11,12 +11,14 @@ const carTalkPage = "https://www.npr.org/podcasts/510208/car-talk";
 // Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
 const magicPageSleepTimer = 700;
 
-async function doStuff(parameters: { showBrowser: boolean, outputFolder: string }) {
+async function doStuff(parameters: { showBrowser: boolean, outputFolder: string, performDownload: boolean }) {
   const browser = await puppeteer.launch({ headless: !parameters.showBrowser });
   const page = await browser.newPage();
   await page.goto(carTalkPage, { waitUntil: 'networkidle2' });
 
-  await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' })
+  console.log("Start");
+
+  await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
 
   let buttonHandle = await page.$(".options__load-more");
 
@@ -37,22 +39,31 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string 
     });
   }
 
+  console.log("Page fully expanded");
+
   const buttonQuery = ".audio-tool.audio-tool-download > a";
-  const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
+  const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));  
 
   if (rawButtonLinks == null) {
     return;
   }
 
+  console.log(`Found ${rawButtonLinks.length} download buttons.`)
+
   const buttonLinks = rawButtonLinks.filter(notNullOrUndefined);
 
+  const folderPath = parameters.outputFolder;
+
+  const existingFiles = getExistingFiles(folderPath);
+
+  console.log(existingFiles);
+
   for (let link of buttonLinks) {
-    const fileName = getFileName(link);
-    const folderPath = parameters.outputFolder;
+    const fileName = getFileName(link);    
 
     console.log(fileName);
 
-    await downloadAudioFromLinkAsync(link, fileName, folderPath);
+    // await downloadAudioFromLinkAsync(link, fileName, folderPath);
   }
 
   console.log(buttonLinks.length);
@@ -82,6 +93,10 @@ async function downloadAudioFromLinkAsync(link: string, fileName: string, folder
     });
 }
 
+function getExistingFiles(filePath:string) {
+  return new Set(fs.readdirSync(filePath));
+}
+
 function getFileName(rawLink: string) {
   const indexOfMp3 = rawLink.indexOf(".mp3");
   const partialSubstring = rawLink.substring(0, indexOfMp3);
@@ -104,7 +119,7 @@ function getAppDataPath() {
   return process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 }
 
-const defaultPath = getAppDataPath() + "\\cartalk-scraper"
+const defaultPath = getAppDataPath() + "\\cartalk-scraper";
 
 program
   .name("cartalk-scraper")
@@ -114,6 +129,7 @@ program
   .option('--force-run-all', 'Compiles the list of Car Talk episodes, and downloads them.', false)
   .option('-f, --output-folder <path>', 'Compiles the list of Car Talk episodes, and downloads them.', defaultPath)
   .option('-d, --dry-run', 'Eventually, this will scrape the Car Talk website and display what the output may represent. Will not download.', false)
+  .option('-e, --download-new-episodes', 'Setting this causes episodes to be downloaded. Eventually will not download if filename already exists in output directory.')
   .parse(process.argv);
 
 if (!process.argv.slice(2).length) {
@@ -128,6 +144,14 @@ if(program.dryRun) {
 else if (program.runAll) {
   doStuff({
     outputFolder: outFolder,
-    showBrowser: program.showBrowser
+    showBrowser: program.showBrowser,
+    performDownload: true
+  });
+}
+else {
+  doStuff({
+    outputFolder: outFolder,
+    showBrowser: program.showBrowser,
+    performDownload: program.downloadNewEpisodes
   });
 }
