@@ -51,7 +51,8 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
     return;
   }
 
-  console.log(`Found ${rawButtonLinks.length} download buttons.`)
+  const totalDownloadButtons = rawButtonLinks.length;
+  console.log(`Found ${totalDownloadButtons} download buttons.`)
 
   const buttonLinks = rawButtonLinks.filter(notNullOrUndefined);
 
@@ -61,15 +62,17 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
 
   console.log(existingFiles);
 
+  let currentDownloadCount = 1;
   for (let link of buttonLinks) {
     const fileName = getFileName(link);
 
+    console.log(`Downloading '${fileName}' (${currentDownloadCount}/${totalDownloadButtons})`);
+
+    currentDownloadCount++;
     if (existingFiles.has(fileName)) {
       console.log(`File ${fileName} already exists.`);
       continue;
     }
-
-    console.log(`Downloading '${fileName}'.`);
 
     await downloadAudioFromLinkAsync(link, fileName, folderPath);
   }
