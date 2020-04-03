@@ -24,13 +24,25 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
   });
 
+
+  let previousDownloadButtonCount = 0;
+  let currentDownloadButtonCount = 0;
+  let currentLoadMoreTryCount = 0;
+
   while (buttonHandle !== null && isNotHidden) {
+    previousDownloadButtonCount = currentDownloadButtonCount;
+
     // Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
     await sleep(settings.loadMoreDelay_ms).then(() => {
       buttonHandle!.click();
-      console.log("Clicked");
+      console.log("Trying to load more...");
     });
-    
+
+    currentDownloadButtonCount = (await page.$$(domQueries.downloadButtons)).length;
+
+
+    console.log(`Found ${currentDownloadButtonCount} download buttons so far.`)
+
     isNotHidden = await page.$eval(domQueries.loadMoreButtons, (elem) => {
       return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
     });
@@ -39,10 +51,22 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
     await page.waitFor(100);
 
     buttonHandle = await page.$(domQueries.loadMoreButtons);
+
+    if (currentDownloadButtonCount == previousDownloadButtonCount) {
+      currentLoadMoreTryCount += 1;
+    }
+    else {
+      currentLoadMoreTryCount = 0;
+    }
+
+    if(currentLoadMoreTryCount > 5) {
+      console.log(`No more buttons have been loaded after ${currentLoadMoreTryCount} attempts. Starting download process.`)
+      break;
+    }
   }
 
   console.log("Page fully expanded");
-  
+
   const rawButtonLinks = await page.$$eval(domQueries.downloadButtons, el => el.map(x => x.getAttribute("href")));
 
   if (rawButtonLinks == null) {
@@ -56,9 +80,7 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
 
   const folderPath = parameters.outputFolder;
 
-  const existingFiles = getExistingFiles(folderPath);
-
-  console.log(existingFiles);
+  const existingFiles = getExistingFiles(folderPath);  
 
   let currentDownloadCount = 1;
   for (let link of buttonLinks) {
@@ -103,7 +125,7 @@ async function downloadAudioFromLinkAsync(link: string, fileName: string, folder
     .catch(error => {
       console.log(`:( error: ${error}`);
       return;
-    });  
+    });
 }
 
 function getExistingFiles(filePath: string) {
