@@ -6,46 +6,44 @@ import program from 'commander'
 import puppeteer from 'puppeteer';
 import fs from 'fs';
 import request from 'request';
-
-const carTalkPage = "https://www.npr.org/podcasts/510208/car-talk";
-// Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
-const magicPageSleepTimer = 700;
+import * as settings from "./settings.json";
+const domQueries = settings.queries;
 
 async function doStuff(parameters: { showBrowser: boolean, outputFolder: string, performDownload: boolean }) {
   const browser = await puppeteer.launch({ headless: !parameters.showBrowser });
   const page = await browser.newPage();
-  await page.goto(carTalkPage, { waitUntil: 'networkidle2' });
+  await page.goto(settings.carTalkPage, { waitUntil: 'networkidle2' });
 
   console.log("Start");
 
   await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
 
-  let buttonHandle = await page.$(".options__load-more");
+  let buttonHandle = await page.$(domQueries.loadMoreButtons);
 
-  let isNotHidden = await page.$eval('.options__load-more', (elem) => {
+  let isNotHidden = await page.$eval(domQueries.loadMoreButtons, (elem) => {
     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
   });
 
   while (buttonHandle !== null && isNotHidden) {
-
-    await sleep(magicPageSleepTimer).then(() => {
+    // Sometimes the page tweaks out if you click "Load More" too fast. This mitigates that issue.
+    await sleep(settings.loadMoreDelay_ms).then(() => {
       buttonHandle!.click();
       console.log("Clicked");
     });
     
-    isNotHidden = await page.$eval('.options__load-more', (elem) => {
+    isNotHidden = await page.$eval(domQueries.loadMoreButtons, (elem) => {
       return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
     });
 
+    // Seems to help with page reloading issues
     await page.waitFor(100);
 
-    buttonHandle = await page.$(".options__load-more");
+    buttonHandle = await page.$(domQueries.loadMoreButtons);
   }
 
   console.log("Page fully expanded");
-
-  const buttonQuery = ".audio-tool.audio-tool-download > a";
-  const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
+  
+  const rawButtonLinks = await page.$$eval(domQueries.downloadButtons, el => el.map(x => x.getAttribute("href")));
 
   if (rawButtonLinks == null) {
     return;
