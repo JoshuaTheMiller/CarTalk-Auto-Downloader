@@ -1,8 +1,12 @@
 {
   "name": "cartalk-scraper",
   "version": "0.1.0",
-  "description": "",
+  "description": "Allows for easier downloading of past car talks from NPR. Script kind of sucks.",
   "main": "out/index.js",
+  "keywords": ["cartalk"],
+  "homepage": "https://joshuathemiller.github.io/CarTalk-Scraper/",
+  "bugs": {"url": "https://github.com/JoshuaTheMiller/CarTalk-Scraper/issues"},
+  "repository": {"type": "git","url": "https://github.com/JoshuaTheMiller/CarTalk-Scraper.git"},
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
