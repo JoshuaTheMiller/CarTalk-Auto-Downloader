@@ -42,7 +42,7 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
   console.log("Page fully expanded");
 
   const buttonQuery = ".audio-tool.audio-tool-download > a";
-  const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));  
+  const rawButtonLinks = await page.$$eval(buttonQuery, el => el.map(x => x.getAttribute("href")));
 
   if (rawButtonLinks == null) {
     return;
@@ -59,9 +59,14 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
   console.log(existingFiles);
 
   for (let link of buttonLinks) {
-    const fileName = getFileName(link);    
+    const fileName = getFileName(link);
 
-    console.log(fileName);
+    if (existingFiles.has(fileName)) {
+      console.log(`File ${fileName} already exists.`);
+      continue;
+    }
+
+    console.log(`Downloading '${fileName}'.`);
 
     await downloadAudioFromLinkAsync(link, fileName, folderPath);
   }
@@ -75,7 +80,8 @@ function notNullOrUndefined<T>(value: T | null | undefined): value is T {
 
 // Make sure to include trailing slash
 async function downloadAudioFromLinkAsync(link: string, fileName: string, folderPath: string) {
-  const filePipe = fs.createWriteStream(folderPath + fileName);
+  const fullFilePath = folderPath + "/" + fileName;
+  const filePipe = fs.createWriteStream(fullFilePath);
 
   await new Promise((resolve, reject) => {
     let stream = request(link)
@@ -90,11 +96,12 @@ async function downloadAudioFromLinkAsync(link: string, fileName: string, folder
   })
     .catch(error => {
       console.log(`:( error: ${error}`);
-    });
+      return;
+    });  
 }
 
-function getExistingFiles(filePath:string) {
-  if(!fs.existsSync(filePath)) {
+function getExistingFiles(filePath: string) {
+  if (!fs.existsSync(filePath)) {
     fs.mkdirSync(filePath);
   }
 
@@ -141,7 +148,7 @@ const outFolder = program.outputFolder;
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
-else if(program.dryRun) {
+else if (program.dryRun) {
   console.log(`Output Folder: '${outFolder}'`)
 }
 else if (program.runAll) {
