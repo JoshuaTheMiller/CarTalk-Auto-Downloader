@@ -18,26 +18,29 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
 
   console.log("Start");
 
-  // await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
+  await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
 
-  // let buttonHandle = await page.$(".options__load-more");
+  let buttonHandle = await page.$(".options__load-more");
 
-  // let isNotHidden = await page.$eval('.options__load-more', (elem) => {
-  //   return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
-  // });
+  let isNotHidden = await page.$eval('.options__load-more', (elem) => {
+    return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
+  });
 
-  // while (buttonHandle !== null && isNotHidden) {
+  while (buttonHandle !== null && isNotHidden) {
 
-  //   await sleep(magicPageSleepTimer).then(() => {
-  //     buttonHandle!.click();
-  //     console.log("Clicked");
-  //   });
+    await sleep(magicPageSleepTimer).then(() => {
+      buttonHandle!.click();
+      console.log("Clicked");
+    });
+    
+    isNotHidden = await page.$eval('.options__load-more', (elem) => {
+      return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
+    });
 
-  //   buttonHandle = await page.$(".options__load-more");
-  //   isNotHidden = await page.$eval('.options__load-more', (elem) => {
-  //     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
-  //   });
-  // }
+    await page.waitFor(100);
+
+    buttonHandle = await page.$(".options__load-more");
+  }
 
   console.log("Page fully expanded");
 
@@ -72,6 +75,8 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
   }
 
   console.log(`Downloaded ${buttonLinks.length} files to '${parameters.outputFolder}'`);
+
+  await page.close();
 }
 
 function notNullOrUndefined<T>(value: T | null | undefined): value is T {
