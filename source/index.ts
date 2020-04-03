@@ -18,26 +18,26 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
 
   console.log("Start");
 
-  await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
+  // await page.addScriptTag({ url: 'https://code.jquery.com/jquery-3.2.1.min.js' });
 
-  let buttonHandle = await page.$(".options__load-more");
+  // let buttonHandle = await page.$(".options__load-more");
 
-  let isNotHidden = await page.$eval('.options__load-more', (elem) => {
-    return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
-  });
+  // let isNotHidden = await page.$eval('.options__load-more', (elem) => {
+  //   return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
+  // });
 
-  while (buttonHandle !== null && isNotHidden) {
+  // while (buttonHandle !== null && isNotHidden) {
 
-    await sleep(magicPageSleepTimer).then(() => {
-      buttonHandle!.click();
-      console.log("Clicked");
-    });
+  //   await sleep(magicPageSleepTimer).then(() => {
+  //     buttonHandle!.click();
+  //     console.log("Clicked");
+  //   });
 
-    buttonHandle = await page.$(".options__load-more");
-    isNotHidden = await page.$eval('.options__load-more', (elem) => {
-      return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
-    });
-  }
+  //   buttonHandle = await page.$(".options__load-more");
+  //   isNotHidden = await page.$eval('.options__load-more', (elem) => {
+  //     return window.getComputedStyle(elem).getPropertyValue('display') !== 'none';
+  //   });
+  // }
 
   console.log("Page fully expanded");
 
@@ -63,10 +63,10 @@ async function doStuff(parameters: { showBrowser: boolean, outputFolder: string,
 
     console.log(fileName);
 
-    // await downloadAudioFromLinkAsync(link, fileName, folderPath);
+    await downloadAudioFromLinkAsync(link, fileName, folderPath);
   }
 
-  console.log(buttonLinks.length);
+  console.log(`Downloaded ${buttonLinks.length} files to '${parameters.outputFolder}'`);
 }
 
 function notNullOrUndefined<T>(value: T | null | undefined): value is T {
@@ -94,6 +94,10 @@ async function downloadAudioFromLinkAsync(link: string, fileName: string, folder
 }
 
 function getExistingFiles(filePath:string) {
+  if(!fs.existsSync(filePath)) {
+    fs.mkdirSync(filePath);
+  }
+
   return new Set(fs.readdirSync(filePath));
 }
 
@@ -132,13 +136,12 @@ program
   .option('-e, --download-new-episodes', 'Setting this causes episodes to be downloaded. Eventually will not download if filename already exists in output directory.')
   .parse(process.argv);
 
+const outFolder = program.outputFolder;
+
 if (!process.argv.slice(2).length) {
   program.outputHelp();
 }
-
-const outFolder = program.outputFolder;
-
-if(program.dryRun) {
+else if(program.dryRun) {
   console.log(`Output Folder: '${outFolder}'`)
 }
 else if (program.runAll) {
