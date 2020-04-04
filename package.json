@@ -1,6 +1,6 @@
 {
   "name": "cartalk-auto-downloader",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Allows for easier downloading of past car talks from NPR. Script kind of sucks. After installing globally, run cartalkad for more info.",
   "main": "out/index.js",
   "keywords": [

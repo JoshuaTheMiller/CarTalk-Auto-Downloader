@@ -150,7 +150,7 @@ function sleep(ms: number) {
 
 console.log(
   chalk.blueBright(
-    figlet.textSync('Car Talk Episode Scraper', { horizontalLayout: 'full' })
+    figlet.textSync('Car Talk Downloader', { horizontalLayout: 'full' })
   )
 );
 
@@ -158,16 +158,16 @@ function getAppDataPath() {
   return process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
 }
 
-const defaultPath = getAppDataPath() + "\\cartalk-scraper";
+const defaultPath = getAppDataPath() + "\\cartalkad";
 
 program
-  .name("cartalk-scraper")
+  .name("cartalkad")
   .version('0.0.1')
   .description('Download publicly available Car Talk episodes via a CLI!')
-  .option('--show-browser', 'Displays the web browser instance as the scraper is running.', false)
+  .option('--show-browser', 'Displays the web browser instance as the downloader is running.', false)
   .option('--force-run-all', 'Compiles the list of Car Talk episodes, and downloads them.', false)
   .option('-f, --output-folder <path>', 'Compiles the list of Car Talk episodes, and downloads them.', defaultPath)
-  .option('-d, --dry-run', 'Eventually, this will scrape the Car Talk website and display what the output may represent. Will not download.', false)
+  .option('-d, --dry-run', 'Eventually, this will search the Car Talk website and display what the output may represent. Will not download.', false)
   .option('-e, --download-new-episodes', 'Setting this causes episodes to be downloaded. Eventually will not download if filename already exists in output directory.')
   .parse(process.argv);
 
