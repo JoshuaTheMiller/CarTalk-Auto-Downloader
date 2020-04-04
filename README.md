@@ -12,7 +12,7 @@ Long story short, a friend of mine asked me if it was possible to do something l
 
 ## What is this?
 
-A tool to help click a bunch of download buttons with only your keyboard!
+A tool to help click a bunch of download buttons with only your keyboard! It is an... auto downloader 🤔
 
 # Running
 
