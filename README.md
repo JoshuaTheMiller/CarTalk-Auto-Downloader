@@ -2,6 +2,12 @@
 
 As with any tool that helps automate tasks you would have done anyways, please use reasonably. As far as [NPR's Terms of Service reads](https://www.npr.org/about-npr/179876898/terms-of-use), you may only use this for personal and noncommercial use to retrieve the Car Talk episodes you would have downloaded for yourself anyways. This tool does not leverage NPR's APIs, so it *should* not fall under the API Content TOS. If you really enjoy Car Talk, think about [supporting NPR](https://www.npr.org/support) by [buying some swag](https://shop.npr.org/) and/or by [making a donation](https://www.npr.org/donations/support).
 
+## How to use
+
+1. Install [node](https://nodejs.org/en/).
+2. From a command prompt, install this globally with `npm install -g cartalk-auto-downloader`.
+3. Type `cartalkad` in a command prompt and hit enter. Further instructions will print out 😊
+
 ## Why did I make this?
 
 ![A random sunrise picture from Feb 2011](./docs/assets/SomeSunriseFrom2011.jpg)
@@ -14,7 +20,7 @@ Long story short, a friend of mine asked me if it was possible to do something l
 
 A tool to help click a bunch of download buttons with only your keyboard! It is an... auto downloader 🤔
 
-# Running
+# Developing
 
 Follow the steps below if you want to use this.
 
@@ -22,11 +28,6 @@ Follow the steps below if you want to use this.
 
 * Install [node & npm](https://www.npmjs.com/get-npm)
 * Install Typescript (`npm install -g typescript`)
-
-## To run
-
-1. `npm install`
-2. `npm run start`
 
 ## To use CLI in development
 

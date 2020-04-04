@@ -1,19 +1,26 @@
 {
   "name": "cartalk-auto-downloader",
-  "version": "0.1.0",
-  "description": "Allows for easier downloading of past car talks from NPR. Script kind of sucks.",
+  "version": "0.0.2",
+  "description": "Allows for easier downloading of past car talks from NPR. Script kind of sucks. After installing globally, run cartalkad for more info.",
   "main": "out/index.js",
-  "keywords": ["cartalk"],
+  "keywords": [
+    "cartalk"
+  ],
   "homepage": "https://joshuathemiller.github.io/CarTalk-Auto-Downloader/",
-  "bugs": {"url": "https://github.com/JoshuaTheMiller/CarTalk-Auto-Downloader/issues"},
-  "repository": {"type": "git","url": "https://github.com/JoshuaTheMiller/CarTalk-Auto-Downloader.git"},
+  "bugs": {
+    "url": "https://github.com/JoshuaTheMiller/CarTalk-Auto-Downloader/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoshuaTheMiller/CarTalk-Auto-Downloader.git"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node ./out/index.js"
   },
   "bin": {
-    "cartalk-scarper": "./out/index.js"
+    "cartalkad": "./out/index.js"
   },
   "author": "JoshuaTheMiller",
   "license": "MIT",
