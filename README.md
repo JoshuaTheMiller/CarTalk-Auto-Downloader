@@ -2,7 +2,7 @@
 
 As with any tool that helps automate tasks you would have done anyways, please use reasonably. As far as [NPR's Terms of Service reads](https://www.npr.org/about-npr/179876898/terms-of-use), you may only use this for personal and noncommercial use to retrieve the Car Talk episodes you would have downloaded for yourself anyways. This tool does not leverage NPR's APIs, so it *should* not fall under the API Content TOS. If you really enjoy Car Talk, think about [supporting NPR](https://www.npr.org/support) by [buying some swag](https://shop.npr.org/) and/or by [making a donation](https://www.npr.org/donations/support).
 
-## How to use
+## How to install and use
 
 1. Install [node](https://nodejs.org/en/).
 2. From a command prompt, install this globally with `npm install -g cartalk-auto-downloader`.
